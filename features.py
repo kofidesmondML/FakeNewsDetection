@@ -1,9 +1,11 @@
 import pandas as pd
 import textstat
 import nltk
-import spacy
+from textblob import TextBlob
 
-nlp = spacy.load("en_core_web_sm")
+# Download necessary NLTK data if not done already
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
 
 csv_path = './data/NewsContent.csv'
 df = pd.read_csv(csv_path)
@@ -11,7 +13,8 @@ df = pd.read_csv(csv_path)
 df['summary'] = df['summary'].where(df['summary'].notna(), None)
 
 def extract_pos_features(text):
-    tagged_sent = nltk.pos_tag(nltk.word_tokenize(text))
+    tokens = nltk.word_tokenize(text)
+    tagged_sent = nltk.pos_tag(tokens)
     pos_dict = {
         'num_nouns': len([word for word, pos in tagged_sent if pos == 'NN']),
         'num_propernouns': len([word for word, pos in tagged_sent if pos == 'NNP']),
@@ -23,10 +26,15 @@ def extract_pos_features(text):
     }
     return pos_dict
 
+def extract_named_entities(text):
+    blob = TextBlob(text)
+    named_entities = [entity for entity, tag in blob.tags if tag == 'NNP']
+    return ', '.join(named_entities)
+
 def extract_features(df):
     features = {
         'NewsID': [],
-        'filename': [],
+        'label': [],
         'Text Length': [],
         'Summary Length': [],
         'Readability Score': [],
@@ -41,7 +49,7 @@ def extract_features(df):
         'num_verbs': [],
         'num_adjectives': []
     }
-    
+
     for _, row in df.iterrows():
         text = row.get('text', None)
         summary = row.get('summary', None)
@@ -52,7 +60,7 @@ def extract_features(df):
             continue
 
         features['NewsID'].append(row.get('NewsID', None))
-        features['filename'].append(row.get('filename', None))
+        features['label'].append(row.get('label', None))
 
         features['Text Length'].append(len(text.split()) if text else 0)
         features['Summary Length'].append(len(summary.split()) if summary is not None else 0)
@@ -62,9 +70,8 @@ def extract_features(df):
         features['Keyword Frequency'].append(keyword_count)
         features['Title Length'].append(len(title.split()) if title else 0)
 
-        doc = nlp(text)
-        named_entities = [ent.text for ent in doc.ents]
-        features['Named Entities'].append(', '.join(named_entities))
+        named_entities = extract_named_entities(text)
+        features['Named Entities'].append(named_entities)
 
         pos_features = extract_pos_features(text)
         features['num_nouns'].append(pos_features['num_nouns'])
@@ -81,6 +88,3 @@ features_df = extract_features(df)
 features_df.to_csv('./data/ExtractedFeatures.csv', index=False)
 
 print("Features extracted and saved to 'ExtractedFeatures.csv'.")
-
-
-

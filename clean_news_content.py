@@ -60,13 +60,13 @@ df = extract_summary(df)
 print(df.head(10))
 print(df['summary'])
 
-#df.to_csv(file_path, index=False)
+df.to_csv(file_path, index=False)
+
+  
 
 
 
 
 
 
-
-
-#df.to_csv(file_path)
+df.to_csv(file_path)
