@@ -1,9 +1,10 @@
 import pandas as pd
 import textstat
+import string
 import ast
 import nltk
 from textblob import TextBlob
-
+ 
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
@@ -100,6 +101,13 @@ def extract_named_entities(text):
     named_entities = [entity for entity, tag in blob.tags if tag == 'NNP']
     return ', '.join(named_entities)
 
+def count_punctuations(text):
+    try:
+        return sum(1 for char in text if char in string.punctuation)
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return 0 
+
 def extract_features(df):
     features = {
         'NewsID': [],
@@ -119,7 +127,8 @@ def extract_features(df):
         'num_adjectives': [],
         'Total Shares': [],
         'Unique User Shares': [],
-        'image_present': []
+        'image_present': [],
+        'punctuation_count': []
     }
 
     for _, row in df.iterrows():
@@ -152,6 +161,8 @@ def extract_features(df):
         features['num_interjections'].append(pos_features['num_interjections'])
         features['num_verbs'].append(pos_features['num_verbs'])
         features['num_adjectives'].append(pos_features['num_adjectives'])
+        punctuation_count=count_punctuations(text)
+        features['punctuation_count'].append(punctuation_count)
 
     return pd.DataFrame(features)
 
