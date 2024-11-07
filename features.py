@@ -1,15 +1,18 @@
 import pandas as pd
 import textstat
 import string
+import ssl
 import ast
 import nltk
 from textblob import TextBlob
- 
+
+
+ssl._create_default_https_context = ssl._create_unverified_context 
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
 csv_path = './data/NewsContent.csv'
-news_user_path = './data/News_user.csv'
+news_user_path = './data/News_User.csv'
 df = pd.read_csv(csv_path)
 
 def calculate_total_shares(filepath=news_user_path):
