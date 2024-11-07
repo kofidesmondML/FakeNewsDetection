@@ -128,31 +128,26 @@ def extract_features(df):
         'Total Shares': [],
         'Unique User Shares': [],
         'image_present': [],
-        #'punctuation_count': []
+        'punctuation_count': []  # Added punctuation count back here
     }
 
     for _, row in df.iterrows():
-        text = row.get('text', None)
-        summary = row.get('summary', None)
-        title = row.get('title', None)
-        keywords = row.get('keywords', None)
-
-        if not text or not title or (isinstance(keywords, str) and not keywords.strip()):
-            continue
-
-        if isinstance(text, float):
-            text = str(text)
+        text = str(row.get('text', "")) if pd.notna(row.get('text')) else ""
+        summary = str(row.get('summary', "")) if pd.notna(row.get('summary')) else ""
+        title = str(row.get('title', "")) if pd.notna(row.get('title')) else ""
+        keywords = str(row.get('keywords', "")) if pd.notna(row.get('keywords')) else ""
 
         features['NewsID'].append(row.get('NewsID', None))
         features['label'].append(row.get('filename', None))
-        features['Text Length'].append(len(text.split()) if isinstance(text, str) else 0)
-        features['Summary Length'].append(len(summary.split()) if summary is not None else 0)
+        features['Text Length'].append(len(text.split()) if text else 0)
+        features['Summary Length'].append(len(summary.split()) if summary else 0)
         features['Readability Score'].append(textstat.flesch_kincaid_grade(text) if text else None)
-        keyword_count = sum(text.lower().count(keyword.lower()) for keyword in keywords.split(',')) if isinstance(keywords, str) else 0
+        keyword_count = sum(text.lower().count(keyword.lower()) for keyword in keywords.split(',')) if keywords else 0
         features['Keyword Frequency'].append(keyword_count)
         features['Title Length'].append(len(title.split()) if title else 0)
-        named_entities = extract_named_entities(text)
+        named_entities = extract_named_entities(text) if text else ""
         features['Named Entities'].append(named_entities)
+
         pos_features = extract_pos_features(text)
         features['num_nouns'].append(pos_features['num_nouns'])
         features['num_propernouns'].append(pos_features['num_propernouns'])
@@ -161,10 +156,13 @@ def extract_features(df):
         features['num_interjections'].append(pos_features['num_interjections'])
         features['num_verbs'].append(pos_features['num_verbs'])
         features['num_adjectives'].append(pos_features['num_adjectives'])
-        punctuation_count=count_punctuations(text)
-        #features['punctuation_count'].append(punctuation_count)
+
+        # Include punctuation count in features
+        punctuation_count = count_punctuations(text)
+        features['punctuation_count'].append(punctuation_count)
 
     return pd.DataFrame(features)
+
 
 features_df = extract_features(df)
 total_shares_df = calculate_total_shares(news_user_path)
