@@ -63,10 +63,3 @@ print(df['summary'])
 df.to_csv(file_path, index=False)
 
   
-
-
-
-
-
-
-df.to_csv(file_path)
