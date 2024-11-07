@@ -7,9 +7,11 @@ from textblob import TextBlob
 nltk.download('punkt')
 nltk.download('averaged_perceptron_tagger')
 
+# Load data
 csv_path = './data/NewsContent.csv'
 df = pd.read_csv(csv_path)
 
+# Ensure missing values in 'summary' are set to None
 df['summary'] = df['summary'].where(df['summary'].notna(), None)
 
 def extract_pos_features(text):
@@ -56,17 +58,28 @@ def extract_features(df):
         title = row.get('title', None)
         keywords = row.get('keywords', None)
 
-        if not text or not title or (keywords and not keywords.strip()):
+        # Check for valid text, title, and keywords (ensure keywords is a string)
+        if not text or not title or (isinstance(keywords, str) and not keywords.strip()):
             continue
+
+        # Ensure text is a valid string before processing
+        if isinstance(text, float):  # This handles NaN or float types
+            text = str(text)
 
         features['NewsID'].append(row.get('NewsID', None))
         features['label'].append(row.get('label', None))
 
-        features['Text Length'].append(len(text.split()) if text else 0)
+        features['Text Length'].append(len(text.split()) if isinstance(text, str) else 0)
         features['Summary Length'].append(len(summary.split()) if summary is not None else 0)
-        features['Readability Score'].append(textstat.flesch_kincaid_grade(text) if text else None)
+        
+        # Handle non-string or NaN text for readability score
+        if isinstance(text, str):
+            features['Readability Score'].append(textstat.flesch_kincaid_grade(text) if text else None)
+        else:
+            features['Readability Score'].append(None)
 
-        keyword_count = sum(text.lower().count(keyword.lower()) for keyword in keywords.split(',')) if keywords else 0
+        # Calculate keyword frequency only if keywords is a valid string
+        keyword_count = sum(text.lower().count(keyword.lower()) for keyword in keywords.split(',')) if isinstance(keywords, str) else 0
         features['Keyword Frequency'].append(keyword_count)
         features['Title Length'].append(len(title.split()) if title else 0)
 
@@ -84,7 +97,10 @@ def extract_features(df):
 
     return pd.DataFrame(features)
 
+# Extract features from the DataFrame
 features_df = extract_features(df)
+
+# Save extracted features to a CSV file
 features_df.to_csv('./data/ExtractedFeatures.csv', index=False)
 
 print("Features extracted and saved to 'ExtractedFeatures.csv'.")
