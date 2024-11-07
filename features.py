@@ -128,9 +128,6 @@ def extract_features(df):
         'num_interjections': [],
         'num_verbs': [],
         'num_adjectives': [],
-        'Total Shares': [],
-        'Unique User Shares': [],
-        'image_present': [],
         'punctuation_count': []  # Added punctuation count back here
     }
 
@@ -164,6 +161,9 @@ def extract_features(df):
         punctuation_count = count_punctuations(text)
         features['punctuation_count'].append(punctuation_count)
 
+    for key, value in features.items():
+        print(f"{key}: {len(value)}")
+
     return pd.DataFrame(features)
 
 
@@ -181,4 +181,7 @@ if image_presence_df is not None:
     features_df = features_df.merge(image_presence_df, on='NewsID', how='left')
 if image_count_df is not None:
     features_df = features_df.merge(image_count_df, on='NewsID', how='left')
-features_df.to_csv('ExtractedFeatures.csv', index=False)
+
+print(features_df.columns)
+features_df.to_csv('./data/ExtractedFeatures.csv', index=False)
+print('All features extracted successfully')
