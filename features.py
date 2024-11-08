@@ -317,7 +317,7 @@ def extract_features(df):
         features['label'].append(row.get('filename', None))
         features['Text Length'].append(len(text.split()) if text else 0)
         features['Summary Length'].append(len(summary.split()) if summary else 0)
-        features['Readability Score'].append(textstat.flesch_kincaid_grade(text) if text else None)
+        features['Readability Score'].append(textstat.flesch_kincaid_grade(text) if text else 0)
         keyword_count = sum(text.lower().count(keyword.lower()) for keyword in keywords.split(',')) if keywords else 0
         features['Keyword Frequency'].append(keyword_count)
         features['Title Length'].append(len(title.split()) if title else 0)
