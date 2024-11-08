@@ -32,8 +32,8 @@ def run_classification(X,y):
       y_train = y.iloc[tr_ind]
       y_test = y.iloc[tst_ind]
 
-      clf = LogisticRegression(penalty='l2', class_weight='balanced', solver='lbfgs')
-      #clf = RandomForestClassifier(random_state=0,class_weight="balanced")
+      #clf = LogisticRegression(penalty='l2', class_weight='balanced', solver='lbfgs')
+      clf = RandomForestClassifier(random_state=0,class_weight="balanced")
       clf.fit(X_train, y_train)  
       # predict the labels on test dataset
       predictions = clf.predict(X_test)
