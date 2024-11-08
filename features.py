@@ -1,6 +1,8 @@
 import pandas as pd
 import textstat
 import string
+import networkx as nx
+from itertools import combinations
 import ssl
 import ast
 import nltk
@@ -13,6 +15,8 @@ nltk.download('averaged_perceptron_tagger')
 
 csv_path = './data/NewsContent.csv'
 news_user_path = './data/News_User.csv'
+user_user_path='./data/User_user.csv'
+graph_path='./PolitiFact/PolitiFactUserUser.txt'
 df = pd.read_csv(csv_path)
 
 def calculate_total_shares(filepath=news_user_path):
@@ -111,6 +115,75 @@ def count_punctuations(text):
         print(f"An unexpected error occurred: {e}")
         return 0 
 
+def get_follower_counts(filepath):
+    try:
+        df = pd.read_csv(filepath)
+        follower_counts = df.groupby('followed_id')['follower_id'].nunique().reset_index()
+        follower_counts.columns = ['UserID', 'FollowerCount']
+        return follower_counts
+    except FileNotFoundError:
+        print(f"Error: The file '{filepath}' was not found.")
+        return pd.DataFrame(columns=['UserID', 'FollowerCount'])
+    except pd.errors.EmptyDataError:
+        print("Error: The file is empty.")
+        return pd.DataFrame(columns=['UserID', 'FollowerCount'])
+    except pd.errors.ParserError:
+        print("Error: The file is not formatted correctly.")
+        return pd.DataFrame(columns=['UserID', 'FollowerCount'])
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return pd.DataFrame(columns=['UserID', 'FollowerCount'])
+
+def get_unique_users_per_news(df):
+    try:
+        unique_users_per_news = df.groupby('NewsID')['UserID'].unique().reset_index()
+        unique_users_per_news.columns = ['NewsID', 'UniqueUserList']
+        unique_users_per_news = unique_users_per_news.sort_values(by='NewsID').reset_index(drop=True)
+        return unique_users_per_news
+    except KeyError as e:
+        print(f"Error: Missing column in the DataFrame - {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+def get_avg_followers_per_news(news_df, follower_df):
+    try:
+        unique_users_per_news = get_unique_users_per_news(news_df)
+        merged = unique_users_per_news.explode('UniqueUserList')
+        merged = merged.merge(follower_df, how='left', left_on='UniqueUserList', right_on='UserID')
+        avg_followers_per_news = merged.groupby('NewsID')['FollowerCount'].mean().reset_index()
+        avg_followers_per_news.columns = ['NewsID', 'AvgFollowers']
+        return avg_followers_per_news
+    except KeyError as e:
+        print(f"Error: Missing column in the DataFrame - {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")  
+
+    
+def jaccard_similarity(node1, node2, G):
+    neighbors1 = set(G.neighbors(int(node1)))  
+    neighbors2 = set(G.neighbors(int(node2)))  
+    intersection = len(neighbors1.intersection(neighbors2))
+    union = len(neighbors1.union(neighbors2))
+    if union == 0:
+        return 0
+    return intersection / union
+def average_node_similarity(G,df):
+    results = []
+    for news_id in df['NewsID'].unique():
+        users = df[df['NewsID'] == news_id]['UniqueUserList'].values[0]
+        similarities = []
+        for user1, user2 in combinations(users, 2):
+            similarity = jaccard_similarity(user1, user2, G)
+            similarities.append(similarity)
+        if similarities:
+            avg_similarity = sum(similarities) / len(similarities)
+        else:
+            avg_similarity = 0
+        results.append([news_id, avg_similarity])
+    
+    return pd.DataFrame(results, columns=['NewsID', 'AverageSimilarity'])
+
+
 def extract_features(df):
     features = {
         'NewsID': [],
@@ -128,7 +201,7 @@ def extract_features(df):
         'num_interjections': [],
         'num_verbs': [],
         'num_adjectives': [],
-        'punctuation_count': []  # Added punctuation count back here
+        'punctuation_count': []
     }
 
     for _, row in df.iterrows():
@@ -167,11 +240,18 @@ def extract_features(df):
     return pd.DataFrame(features)
 
 
+G = nx.read_edgelist(graph_path, nodetype=int)
+news_user_df=pd.read_csv(news_user_path)
+unique_users=get_unique_users_per_news(news_user_df)
+follower_counts_df = get_follower_counts(user_user_path)
+news_user_df = pd.read_csv(news_user_path)
+avg_followers_df = get_avg_followers_per_news(news_user_df, follower_counts_df)
 features_df = extract_features(df)
 total_shares_df = calculate_total_shares(news_user_path)
 unique_user_shares_df = count_unique_user_shares(news_user_path)
 image_presence_df = mark_top_img_presence(df)
 image_count_df = count_images(df)
+node_similarity_df=average_node_similarity(G,df=unique_users)
 
 if total_shares_df is not None:
     features_df = features_df.merge(total_shares_df, on='NewsID', how='left')
@@ -181,6 +261,10 @@ if image_presence_df is not None:
     features_df = features_df.merge(image_presence_df, on='NewsID', how='left')
 if image_count_df is not None:
     features_df = features_df.merge(image_count_df, on='NewsID', how='left')
+if avg_followers_df is not None:
+    features_df=features_df.merge(avg_followers_df, on='NewsID', how='left')
+if node_similarity_df is not None:
+    features_df=features_df.merge(node_similarity_df, on='NewsID', how='left')
 
 print(features_df.columns)
 features_df.to_csv('./data/ExtractedFeatures.csv', index=False)
