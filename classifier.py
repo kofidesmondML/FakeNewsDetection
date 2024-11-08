@@ -10,6 +10,9 @@ from sklearn.metrics import confusion_matrix
 from sklearn.metrics import average_precision_score
 
 
+features_path='./data/ExtractedFeatures.csv'
+
+
 def run_classification(X,y):
 
   skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
@@ -23,10 +26,11 @@ def run_classification(X,y):
 
 
   for tr_ind, tst_ind in skf.split(X,y):
-      X_train = X[tr_ind]
-      X_test = X[tst_ind]
-      y_train = y[tr_ind]
-      y_test = y[tst_ind]
+      print(tr_ind)
+      X_train = X.iloc[tr_ind]
+      X_test = X.iloc[tst_ind]
+      y_train = y.iloc[tr_ind]
+      y_test = y.iloc[tst_ind]
 
       clf = LogisticRegression(penalty='l2', class_weight='balanced', solver='lbfgs')
       #clf = RandomForestClassifier(random_state=0,class_weight="balanced")
@@ -59,4 +63,21 @@ def run_classification(X,y):
         "AUROC = ", round(np.mean(auc_scores)*100,3),"\n", 
         "Average Precision = ", round(np.mean(AVG_precision_scores)*100,3),"\n", )
   
+features_df=pd.read_csv(features_path)
+print(features_df['label'])
+features_df['label'] = features_df['label'].apply(lambda x: 0 if "Real" in x else 1)
+print(features_df['label'])
+X = features_df.drop(columns=['label','Named Entities'])
+y = features_df['label']
+nan_columns = features_df.columns[features_df.isna().any()].tolist()
+nan_counts = features_df.isna().sum()
+
+print("Columns with NaN values:")
+for col in nan_columns:
+    print(f"{col}: {nan_counts[col]} NaNs")
+
+run_classification(X,y)
+  
+
+
   
