@@ -5,6 +5,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from xgboost import XGBClassifier
 from sklearn import metrics
 from sklearn.metrics import roc_auc_score, confusion_matrix, ConfusionMatrixDisplay, average_precision_score
 import seaborn as sns
@@ -24,7 +25,8 @@ def run_classification(X, y):
         "Logistic Regression": LogisticRegression(penalty='l2', class_weight='balanced', solver='lbfgs'),
         "Random Forest": RandomForestClassifier(random_state=0, class_weight="balanced"),
         "Decision Tree": DecisionTreeClassifier(random_state=0, class_weight="balanced"),
-        "Gradient Boosting": GradientBoostingClassifier(random_state=0)
+        "Gradient Boosting": GradientBoostingClassifier(random_state=0),
+        "XGBoost": XGBClassifier(use_label_encoder=False, eval_metric='logloss', random_state=0)
     }
 
     skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=123)
@@ -76,10 +78,12 @@ def run_classification(X, y):
     metrics_df.to_csv("results/classifier_metrics.csv", index=False)
     
     metrics_df.set_index("Classifier", inplace=True)
-    metrics_df.plot(kind="bar", figsize=(12, 8))
+    metrics_df.T.plot(kind="bar", figsize=(12, 8))
     plt.title("Classifier Performance Metrics")
     plt.ylabel("Score")
     plt.xticks(rotation=45)
+    plt.legend(title="Classifier", bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
     plt.savefig("results/classifier_performance_metrics.png")
     plt.show()
 
