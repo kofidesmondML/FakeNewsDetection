@@ -1,0 +1,10 @@
+
+pandas
+numpy
+nltk
+textblob
+vaderSentiment
+networkx
+scikit-learn
+matplotlib
+seaborn
