@@ -2,17 +2,61 @@
 
 ## Overview
 
-This project analyzes news articles and user interactions, creating various features for applications like classification, recommendation, or network analysis. Using tools from natural language processing (NLP), graph analysis, and sentiment analysis, it extracts features from news articles and builds relationships among user interactions to create comprehensive insights.
+## Overview
+The goal of this project is to build a machine learning classifier that can predict whether a news article is fake or not based on its features. The project involves preprocessing data, training multiple classification models, and evaluating their performance using 5-fold cross-validation.
+
+### Trained Models:
+- **XGBoost**
+- **Gradient Boosting (SGBoost)**
+- **Logistic Regression**
+- **Random Forest**
+- **Decision Tree**
+
+### Evaluation Metrics:
+The models are compared based on the following evaluation metrics:
+- **Precision**
+- **Recall**
+- **F1 Score**
+- **Accuracy**
+- **AUROC (Area Under the Receiver Operating Characteristic Curve)**
+
+5-fold cross-validation is used to ensure the robustness and generalizability of the models.
+
+The models are trained on the dataset, and the evaluation metrics for each classifier are recorded for comparison. The results will help identify the most effective model for detecting fake news articles.
 
 ---
+## Main Functions
 
-## Features
+### Feature Extraction Functions
+- **`calculate_total_shares`**: Aggregates total shares per news article.
+- **`mark_top_img_presence`**: Marks if the main image (top_img) is present for each news article.
+- **`count_images`**: Counts the number of images in each news article.
+- **`count_unique_user_shares`**: Calculates the number of unique users who shared each news article.
 
-- **Sentiment Analysis**: Extracts sentiment metrics for news articles, summaries, and titles.
-- **Emotion Detection**: Uses the NRC Emotion Lexicon to identify emotional tones within articles.
-- **Readability & Structure**: Measures readability scores, punctuation counts, and part-of-speech distribution.
-- **Graph Analysis**: Builds user relationships using Jaccard similarity and network features.
-- **User Metrics**: Analyzes unique user interactions, total shares, and average follower count per article.
+### Text Analysis Functions
+- **`extract_pos_features`**: Extracts Part-of-Speech (POS) features from the text, such as nouns, verbs, adjectives, etc.
+- **`extract_named_entities`**: Uses TextBlob to extract named entities from the text.
+- **`count_punctuations`**: Counts the number of punctuation marks in the text.
+
+### Sentiment Analysis Functions
+- **`analyze_sentiment_vader`**: Uses NLTK’s VADER sentiment analyzer to calculate sentiment scores for the text.
+- **`get_sentiment_for_titles`**: Calculates sentiment scores specifically for news article titles.
+- **`get_sentiment_for_text`**: Calculates sentiment scores for the main body of text.
+
+### Emotion Analysis Functions
+- **`emotion_NRC`**: Computes emotion vectors for each news article text or title using the NRC Emotion Lexicon.
+- **`NRC_dict`**: Reads the emotion lexicon file to create a dictionary mapping words to emotions.
+- **`getEmotionVector`**: Given a text, this function returns a vector of emotions based on words present in the text and their associations in the NRC lexicon.
+
+### Graph Analysis Functions
+- **`jaccard_similarity`**: Computes Jaccard similarity between two nodes in a graph.
+- **`average_node_similarity`**: Calculates the average Jaccard similarity for users who engaged with each news article.
+
+### User Analysis Functions
+- **`get_follower_counts`**: Calculates follower counts for each user from the user-to-user relationship data.
+- **`get_unique_users_per_news`**: Identifies unique users who interacted with each news article.
+- **`get_avg_followers_per_news`**: Computes the average number of followers for users interacting with each news article.
+
 
 ---
 
@@ -34,35 +78,4 @@ This project analyzes news articles and user interactions, creating various feat
     nltk.download('vader_lexicon')
     ```
 
----
 
-## Data Files
-
-Place the following data files in the `data/` folder:
-
-- **NewsContent.csv**: Contains main news article content.
-- **News_User.csv**: Links users to articles with share counts.
-- **User_user.csv**: Lists user-to-user relationships (followers).
-- **NRC-Emotion-Lexicon-Wordlevel-v0.92.txt**: Emotion lexicon file for emotion mapping.
-
----
-
-## Project Structure
-
-```plaintext
-project_root/
-│
-├── data/
-│   ├── NewsContent.csv
-│   ├── News_User.csv
-│   └── User_user.csv
-│
-├── NRC-Emotion-Lexicon-Wordlevel-v0.92.txt
-│
-├── src/
-│   ├── feature_extraction.py    # Main feature extraction functions
-│   ├── sentiment_analysis.py    # Sentiment and emotion analysis functions
-│   ├── graph_analysis.py        # User relationship and graph analysis
-│   └── main.py                  # Main script to execute feature extraction
-│
-└── README.md
