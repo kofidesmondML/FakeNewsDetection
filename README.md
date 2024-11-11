@@ -1,4 +1,4 @@
-# News Content Analysis Project
+# Fake News Detection Project
 
 ## Overview
 
@@ -77,5 +77,10 @@ The models are trained on the dataset, and the evaluation metrics for each class
     nltk.download('averaged_perceptron_tagger')
     nltk.download('vader_lexicon')
     ```
+---
+
+
+
+ 
 
 
