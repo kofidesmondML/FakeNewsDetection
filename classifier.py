@@ -60,7 +60,7 @@ def run_classification(X, y):
             avg_precision_scores.append(average_precision_score(y_test, proba))
 
             cm = confusion_matrix(y_test, predictions)
-            disp = ConfusionMatrixDisplay(confusion_matrix=cm)
+            disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Real", "Fake"])
             disp.plot(cmap="Blues")
             plt.title(f"Confusion Matrix - {name}")
             plt.savefig(f"results/confusion_matrix_{name}.png")
