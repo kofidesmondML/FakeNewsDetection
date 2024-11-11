@@ -332,8 +332,6 @@ def extract_features(df):
         features['num_interjections'].append(pos_features['num_interjections'])
         features['num_verbs'].append(pos_features['num_verbs'])
         features['num_adjectives'].append(pos_features['num_adjectives'])
-
-        # Include punctuation count in features
         punctuation_count = count_punctuations(text)
         features['punctuation_count'].append(punctuation_count)
 
