@@ -340,22 +340,32 @@ def extract_features(df):
 
     return pd.DataFrame(features)
 
-
+print('Reading in the graph from the PolitifactUserUser.txt')
 G = nx.read_edgelist(graph_path, nodetype=int)
+print('Extracting sentiment from the news titles ')
 title_sentiment_df=get_sentiment_for_titles(df)
+print('Extracting sentiments from the news text')
 text_sentiment_df=get_sentiment_for_text(df)
 news_user_df=pd.read_csv(news_user_path)
+print('Extracting the number of user for each news ')
 unique_users=get_unique_users_per_news(news_user_df)
+print('Extracting follower count and avergae follower count for each news')
 follower_counts_df = get_follower_counts(user_user_path)
 news_user_df = pd.read_csv(news_user_path)
 avg_followers_df = get_avg_followers_per_news(news_user_df, follower_counts_df)
 features_df = extract_features(df)
+print('Calculating the total number of times each news has been shared')
 total_shares_df = calculate_total_shares(news_user_path)
 unique_user_shares_df = count_unique_user_shares(news_user_path)
+print('Checking for the presence of an image')
 image_presence_df = mark_top_img_presence(df)
+print('Checking for the number of images ')
 image_count_df = count_images(df)
+print('calculating the average node similarity of users who shared a particular news id')
 node_similarity_df=average_node_similarity(G,df=unique_users)
+print('Checking emotions in each of the  title')
 title_emotion_df = emotion_NRC(df, emotion_lexicon_path, 'title')
+print('checking the emotions in each of the texts')
 text_emotion_df=emotion_NRC(df,emotion_lexicon_path, 'text')
 
 

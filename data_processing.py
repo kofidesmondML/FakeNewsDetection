@@ -3,6 +3,7 @@ import os
 import json
 import re 
 
+print('Started cleaning PolitiFactNewsUser.txt')
 file_path = './PolitiFact/PolitiFactNewsUser.txt'
 with open(file_path, 'r') as file:
     content = file.read()
@@ -11,8 +12,9 @@ column_names = ['NewsID', 'UserID', 'Shares']
 df = pd.read_csv(file_path, delimiter='\t', names=column_names)
 print(df.head())
 df.to_csv('./data/News_User.csv', index=False)
+print('Done cleaning PolitifactNewsUser.txt')
 
-
+print('Started cleaning PolitiFactUserUser.txt')
 user_user_path='./PolitiFact/PolitiFactUserUser.txt'
 with open(user_user_path, 'r') as file:
     content=file.read()
@@ -20,8 +22,10 @@ column_names = ['follower_id', 'followed_id']
 df=pd.read_csv(user_user_path,delimiter='\t', names=column_names)
 print(df.head())
 df.to_csv('./data/User_User.csv', index=False)
+print('Done cleaning PolitiFactUserUser.txt')
 
 
+print('Started cleaning PolitiFactNews.txt')
 news_path = './PolitiFact/News.txt'
 with open(news_path, 'r') as file:
     content = file.read()
@@ -32,6 +36,7 @@ df.index += 1
 df.rename_axis('NewsID', inplace=True)
 print(df.head())
 df.to_csv('./data/News.csv', index=True)
+print('Done cleaning PolitiFactNews.txt')
 
 
 def json_folder_to_csv(folder_path, output_csv):
@@ -58,7 +63,7 @@ def json_folder_to_csv(folder_path, output_csv):
     df.to_csv(output_csv, index=False)
     print(f"Data successfully saved to {output_csv}")
 
-
+print('Cleaning up the json files for the news items ')
 json_folder_to_csv('./PolitiFact/FakeNewsContent/', './data/FakeNewsContent.csv')
 json_folder_to_csv('./PolitiFact/RealNewsContent/', './data/RealNewsContent.csv')
 
@@ -73,7 +78,7 @@ merged_df.to_csv('./data/MergedNewsContent.csv', index=False)
 
 
 
-
+print("Saving the news articles into a csv file with the news id and the labels")
 merged_csv_path = './data/MergedNewsContent.csv'
 news_csv_path = './data/News.csv'
 output_path = './data/NewsContent.csv'
