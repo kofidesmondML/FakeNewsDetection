@@ -7,6 +7,7 @@ file_path = './data/NewsContent.csv'
 df = pd.read_csv(file_path)
 print(df.head(10))
 
+
 def clean_publish_date(df):
     def convert_date(date_string):
         try:
@@ -21,7 +22,7 @@ def clean_publish_date(df):
     
     df['publish_date'] = df['publish_date'].apply(convert_date)
     return df
-
+print('cleaning up the date and changing into a datetime object')
 df = clean_publish_date(df)
 
 def process_authors(df):
@@ -37,7 +38,7 @@ def process_authors(df):
 
     df['authors'] = df.apply(convert_authors, axis=1)
     return df
-
+print('Started cleaning up the names of authors and saving into a list')
 df = process_authors(df)
 
 def extract_summary(df):
@@ -54,7 +55,7 @@ def extract_summary(df):
 
     df['summary'] = df.apply(get_summary, axis=1)
     return df
-
+print('Extracting summary from the metadata into the NewsContent.csv')
 df = extract_summary(df)
 
 print(df.head(10))
