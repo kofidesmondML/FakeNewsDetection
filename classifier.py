@@ -17,7 +17,7 @@ features_path = './data/ExtractedFeatures.csv'
 features_df = pd.read_csv(features_path)
 features_df['label'] = features_df['label'].apply(lambda x: 0 if "Real" in x else 1)
 
-X = features_df.drop(columns=['label', 'Named Entities'])
+X = features_df.drop(columns=['NewsID','label', 'Named Entities'])
 y = features_df['label']
 
 def run_classification(X, y):
