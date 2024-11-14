@@ -77,6 +77,9 @@ The models are trained on the dataset, and the evaluation metrics for each class
     nltk.download('averaged_perceptron_tagger')
     nltk.download('vader_lexicon')
     ```
+- Confiirm the required NRC data is downloaded in your folder (NRC-Emotion-Lexicon-Wordlevel-v0.92.txt)
+  
+    
 ---
 
 
