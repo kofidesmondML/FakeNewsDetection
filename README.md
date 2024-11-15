@@ -82,7 +82,7 @@ The models are trained on the dataset, and the evaluation metrics for each class
     
 ---
 ## Description of each file
-- data_processing.py: This code preprocess the PolitiFactNewsUser.txt, PolitiFactUserUser.txt, and PolitiFactNews.txt and collects all the JSON files into a csv. The output is the NewsContent.csv in the data folder.
+- data_processing.py: This code preprocess the PolitiFactNewsUser.txt, PolitiFactUserUser.txt, and PolitiFactNews.txt and collects all the JSON files into a csv. The output are the NewsContent.csv, News_User.csv and User_User.csv files in the data folder.
 - clean_news_content.py: The clean_news_content.py is used to clean up the date section and also clean the list of authors and extract the summary of the news article from the metadata.
 - features.py: This code is used to compute the features. The output is ExtractedFeatures.csv in the data folder.
 - classifier.py: This code is used to run the various classifiers used in this project.
