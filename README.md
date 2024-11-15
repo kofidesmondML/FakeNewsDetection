@@ -1,6 +1,6 @@
 # Fake News Detection Project
 
-## Overview
+
 
 ## Overview
 The goal of this project is to build a machine learning classifier that can predict whether a news article is fake or not based on its features. The project involves preprocessing data, training multiple classification models, and evaluating their performance using 5-fold cross-validation.
@@ -81,8 +81,17 @@ The models are trained on the dataset, and the evaluation metrics for each class
   
     
 ---
+## Description of each file
+- data_processing.py: This code preprocess the PolitiFactNewsUser.txt, PolitiFactUserUser.txt, and PolitiFactNews.txt. The output is the following: MergedNewsContent.csv, News.csv, and NewsContent.csv in the data folder.
+- clean_news_content.py:
+- features.py: This code is used to compute the features. The output is ExtractedFeatures.csv in the data folder.
+- classifier.py: This code is used to run the various classifiers used in this project.
 
 
+
+
+
+---
 
  
 
